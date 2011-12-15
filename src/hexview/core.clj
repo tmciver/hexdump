@@ -3,13 +3,16 @@
 ;; Thanks go out to kumarshantanu and TimMc from #clojure for contributions of
 ;; code and ideas
 
-(defn printable-or-period
+(defn printable?
+  "Returns logical true is the given value is not an ISO control character."
+  [val]
+  (not (Character/isISOControl val)))
+
+(defn printable
   "Returns the ASCII character corresponding to the given value if it is a printable
 ASCII character, or a period otherwise."
   [val]
-  (let [modval (mod val 256)
-        printable? (fn [val]
-                     (or (and (> val 0x1f) (< val 0x7f)) (and (> val 0x9f) (< val 0xff))))]
+  (let [modval (mod val 256)]
     (if (printable? modval)
       (char modval)
       \.)))
@@ -49,7 +52,7 @@ ASCII character, or a period otherwise."
 (defn hexstr4
   [bytes]
   (let [heading (map #(format "%01X%01X" %1 %2) (range 1 17) (range 1 17))
-        printable-ascii-chunks (partition 16 16 (repeat " ") (map #(printable-or-period %) bytes))
+        printable-ascii-chunks (partition 16 16 (repeat " ") (map #(printable %) bytes))
         hex (map #(format "%02X" %) bytes)
         s (interpose \space (partition-all 2 hex))
         s2 (interpose \space (partition-all 8 s))
@@ -72,7 +75,7 @@ ASCII character, or a period otherwise."
 
 (defn ascii-lines
   [s]
-  (->> (map #(printable-or-period %) s)
+  (->> (map #(printable %) s)
        (partition 16 16 (repeat \space))
        (map #(apply str %))))
 
