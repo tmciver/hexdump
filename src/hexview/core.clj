@@ -1,5 +1,8 @@
 (ns hexview.core)
 
+;; Thanks go out to kumarshantanu and TimMc from #clojure for contributions of
+;; code and ideas
+
 (defn printable-or-period
   "Returns the ASCII character corresponding to the given value if it is a printable
 ASCII character, or a period otherwise."
