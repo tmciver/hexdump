@@ -1,0 +1,15 @@
+# hexview
+
+A couple of functions for displaying numerical data (preferably byte arrays)
+as a hex dump (a la xxd).
+
+## Usage
+
+A bit clunky, but for now:
+
+(def hex-dump-seq (hexview-lines))
+(println (apply str hex-dump-lines))
+
+## License
+
+Distributed under the Eclipse Public License, the same as Clojure.
