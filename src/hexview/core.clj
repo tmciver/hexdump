@@ -86,3 +86,8 @@ ASCII character, or a period otherwise."
         ascii-lines (ascii-lines s)
         parts-seq (map list byte-offsets hex-data-lines ascii-lines (repeat \newline))]
     (map #(apply str %) parts-seq)))
+
+(defn hexview
+  "Prints a hexdump of the given sequence of values to *out*."
+  [s]
+  (println (apply str (hexview-lines s))))
