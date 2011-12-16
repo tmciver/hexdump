@@ -8,9 +8,23 @@
   [val]
   (not (Character/isISOControl val)))
 
-(defn printable
+(defn ascii?
+  "Returns true if the given value represents a printable ASCII character."
+  [val]
+  (< 0x1f val 0x7f))
+
+(defn ascii
   "Returns the ASCII character corresponding to the given value if it is a printable
 ASCII character, or a period otherwise."
+  [val]
+  (let [modval (mod val 256)]
+    (if (ascii? modval)
+      (char modval)
+      \.)))
+
+(defn extended-ascii
+  "Returns the ASCII or extended ASCII character corresponding to the given value
+if it is a printable character, or a period otherwise."
   [val]
   (let [modval (mod val 256)]
     (if (printable? modval)
@@ -52,7 +66,7 @@ ASCII character, or a period otherwise."
 (defn hexstr4
   [bytes]
   (let [heading (map #(format "%01X%01X" %1 %2) (range 1 17) (range 1 17))
-        printable-ascii-chunks (partition 16 16 (repeat " ") (map #(printable %) bytes))
+        printable-ascii-chunks (partition 16 16 (repeat " ") (map #(extended-ascii %) bytes))
         hex (map #(format "%02X" %) bytes)
         s (interpose \space (partition-all 2 hex))
         s2 (interpose \space (partition-all 8 s))
@@ -75,7 +89,7 @@ ASCII character, or a period otherwise."
 
 (defn ascii-lines
   [s]
-  (->> (map #(printable %) s)
+  (->> (map #(ascii %) s)
        (partition 16 16 (repeat \space))
        (map #(apply str %))))
 
