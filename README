@@ -11,8 +11,8 @@ To hexdump all values in a sequence my-seq to *out*:
 
 or, to hexdump the first, say, 10 lines:
 
-(def hexdump-lines (hexview-lines))
-(println (apply str (take 10 hex-dump-lines)))
+(def hexdump-lines (hexview-lines my-seq))
+(println (apply str (take 10 hexdump-lines)))
 
 ## License
 
