@@ -5,10 +5,14 @@ as a hex dump (a la xxd).
 
 ## Usage
 
-A bit clunky, but for now:
+To hexdump all values in a sequence my-seq to *out*:
 
-(def hex-dump-seq (hexview-lines))
-(println (apply str hex-dump-lines))
+(hexview my-seq)
+
+or, to hexdump the first, say, 10 lines:
+
+(def hexdump-lines (hexview-lines))
+(println (apply str (take 10 hex-dump-lines)))
 
 ## License
 
