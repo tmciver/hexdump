@@ -80,11 +80,8 @@ if it is a printable character, or a period otherwise."
        (map #(format "%02x" %))
        (partition-all 2)
        (interpose \space)
-       (partition-all 8)
-       (interpose \space)
        flatten
-       (apply str)
-       (partition 42 42 (repeat \space))
+       (partition 24 24 (repeat \space))
        (map #(apply str %))))
 
 (defn ascii-lines
@@ -98,7 +95,7 @@ if it is a printable character, or a period otherwise."
   (let [byte-offsets (map #(format "%08x: " %) (map #(* 16 %) (range)))
         hex-data-lines (hex-dump-lines s)
         ascii-lines (ascii-lines s)
-        parts-seq (map list byte-offsets hex-data-lines ascii-lines (repeat \newline))]
+        parts-seq (map list byte-offsets hex-data-lines (repeat \space) ascii-lines (repeat \newline))]
     (map #(apply str %) parts-seq)))
 
 (defn hexview
