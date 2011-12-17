@@ -32,6 +32,8 @@ if it is a printable character, or a period otherwise."
       \.)))
 
 (defn hexstr-recursive
+  "Recursive version of function that produces a seq of strings representing the
+hexadecimal data display portion of a hexdump."
   [bytes]
   (loop [cnt 0
          mybytes (seq bytes)
@@ -45,6 +47,9 @@ if it is a printable character, or a period otherwise."
       hexstr)))
 
 (defn hexstr2
+  "Another version of a function that produces a seq of strings representing the
+hexadecimal data display portion of a hexdump. This versions sets up data
+  conversion in a let."
   [bytes]                                                                       
   (let [f #(format "%02X" %)                                                    
         h (map f bytes)
@@ -54,6 +59,9 @@ if it is a printable character, or a period otherwise."
     (apply str (flatten s3))))
 
 (defn hexstr3
+  "Another version of a function that produces a seq of strings representing the
+hexadecimal data display portion of a hexdump. This versions sets up data using
+for list comprehension."
   [bytes]
   (let [bytes (seq bytes)
         hexstrseq (for [sixteenbytes (partition 16 bytes)]
@@ -63,18 +71,10 @@ if it is a printable character, or a period otherwise."
                      "\n"))]
     (apply str hexstrseq)))
 
-(defn hexstr4
-  [bytes]
-  (let [heading (map #(format "%01X%01X" %1 %2) (range 1 17) (range 1 17))
-        printable-ascii-chunks (partition 16 16 (repeat " ") (map #(extended-ascii %) bytes))
-        hex (map #(format "%02X" %) bytes)
-        s (interpose \space (partition-all 2 hex))
-        s2 (interpose \space (partition-all 8 s))
-        hexstr (apply str (flatten s2))
-        hexchunks (partition 42 42 (repeat " ") hexstr)]
-    (apply str (flatten (interleave hexchunks printable-ascii-chunks (repeat \newline))))))
-
 (defn hex-dump-lines
+  "Takes a sequence of numerical values and returns a seq of strings
+  representing the hexadecimal data display portion of a hexdump. Only displays
+  the least significant byte of each value."
   [s]
   (->> (map #(mod % 256) s)
        (map #(format "%02x" %))
@@ -91,6 +91,9 @@ if it is a printable character, or a period otherwise."
        (map #(apply str %))))
 
 (defn hexview-lines
+  "Takes a sequence of numerical values and returns a seq of strings
+  representing the output of a hexdump. Only displays the least significant byte
+  of each value."
   [s]
   (let [byte-offsets (map #(format "%08x: " %) (map #(* 16 %) (range)))
         hex-data-lines (hex-dump-lines s)
