@@ -1,4 +1,5 @@
-(ns hexview.core)
+(ns hexview.core
+  (:import [java.io File RandomAccessFile FileNotFoundException]))
 
 ;; Thanks go out to kumarshantanu and TimMc from #clojure for contributions of
 ;; code and ideas
@@ -81,7 +82,8 @@ for list comprehension."
        (partition-all 2)
        (interpose \space)
        flatten
-       (partition 24 24 (repeat \space))
+       (apply str)
+       (partition 40 40 (repeat \space))
        (map #(apply str %))))
 
 (defn ascii-lines
@@ -102,6 +104,17 @@ for list comprehension."
     (map #(apply str %) parts-seq)))
 
 (defn hexview
-  "Prints a hexdump of the given sequence of values to *out*."
+  "Prints a hexdump of the given argument, if it is a java.io.File or
+a sequence of values, to *out*."
   [s]
-  (println (apply str (hexview-lines s))))
+  (cond
+   (string? s) (let [f (File. s)]
+                 (if (.exists f)
+                   (hexview f)
+                   (throw (FileNotFoundException. s))))
+   (instance? java.io.File s) (with-open [raf (RandomAccessFile. s "r")]
+                                (let [fs (.length raf)
+                                      bs (byte-array fs)]
+                                  (.read raf bs 0 fs)
+                                  (hexview bs)))
+   :else (println (apply str (hexview-lines s)))))
