@@ -106,15 +106,30 @@ for list comprehension."
 (defn hexview
   "Prints a hexdump of the given argument, if it is a java.io.File or
 a sequence of values, to *out*."
-  [s]
-  (cond
-   (string? s) (let [f (File. s)]
-                 (if (.exists f)
-                   (hexview f)
-                   (throw (FileNotFoundException. s))))
-   (instance? java.io.File s) (with-open [raf (RandomAccessFile. s "r")]
-                                (let [fs (.length raf)
-                                      bs (byte-array fs)]
-                                  (.read raf bs 0 fs)
-                                  (hexview bs)))
-   :else (println (apply str (hexview-lines s)))))
+  ([s]
+     (hexview s 0 :all))
+  ([s offset]
+     (hexview s offset :all))
+  ([s offset size]
+     (cond
+      (string? s) (let [f (File. s)]
+                    (if (.exists f)
+                      (hexview f offset size)
+                      (throw (FileNotFoundException. s))))
+      (instance? java.io.File s) (with-open [raf (RandomAccessFile. s "r")]
+                                   (let [fs (.length raf)
+                                         bs (byte-array fs)]
+                                     (.read raf bs 0 fs)
+                                     (hexview (seq bs) offset size)))
+      (coll? s) (let [index (fn [s]
+                              (map vector (range) s))
+                      vals (->> s
+                                index
+                                (drop-while #(< (first %) offset))
+                                (#(if (= size :all)
+                                    %
+                                    (take size %)))
+                                (map second))
+                      hexdump-str (apply str (hexview-lines vals))]
+                  (println hexdump-str))
+      :else (throw (RuntimeException. "Can only hexdump a collection, a java.io.File or a String representing a path to a file.")))))
