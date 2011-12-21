@@ -44,34 +44,25 @@ ASCII character, or a period otherwise."
        (map #(apply str %))))
 
 (defn hexview-lines
-  "Takes a sequence of numerical values and returns a seq of strings
-  representing the output of a hexdump. Only displays the least significant byte
-  of each value."
-  [s]
-  (let [byte-offsets (map #(format "%08x: " %) (map #(* 16 %) (range)))
-        hex-data-lines (hex-dump-lines s)
-        ascii-lines (ascii-lines s)
-        parts-seq (map list byte-offsets hex-data-lines (repeat \space) ascii-lines (repeat \newline))]
-    (map #(apply str %) parts-seq)))
-
-(defn hexview
-  "Prints a hexdump of the given argument, if it is a java.io.File or
-a sequence of values, to *out*."
+  "Creates a sequence of lines representing a hexdump of the given argument.
+Optionally supply byte offset (default: 0) and size (default: :all) arguments.
+Can create hexdump from a collection of values, a java.io.File and a String
+representing a path to a file."
   ([s]
-     (hexview s 0 :all))
+     (hexview-lines s 0 :all))
   ([s offset]
-     (hexview s offset :all))
+     (hexview-lines s offset :all))
   ([s offset size]
      (cond
       (string? s) (let [f (File. s)]
                     (if (.exists f)
-                      (hexview f offset size)
+                      (hexview-lines f offset size)
                       (throw (FileNotFoundException. s))))
       (instance? java.io.File s) (with-open [raf (RandomAccessFile. s "r")]
                                    (let [fs (.length raf)
                                          bs (byte-array fs)]
                                      (.read raf bs 0 fs)
-                                     (hexview (seq bs) offset size)))
+                                     (hexview-lines (seq bs) offset size)))
       (coll? s) (let [index (fn [s]
                               (map vector (range) s))
                       vals (->> s
@@ -81,6 +72,27 @@ a sequence of values, to *out*."
                                     %
                                     (take size %)))
                                 (map second))
-                      hexdump-str (apply str (hexview-lines vals))]
-                  (println hexdump-str))
+                      byte-offsets (map #(format "%08x: " %) (map #(* 16 %) (range)))
+                      hex-data-lines (hex-dump-lines vals)
+                      ascii-lines (ascii-lines vals)
+                      parts-seq (map list byte-offsets hex-data-lines (repeat \space) ascii-lines (repeat \newline))]
+                  (map #(apply str %) parts-seq))
       :else (throw (RuntimeException. "Can only hexdump a collection, a java.io.File or a String representing a path to a file.")))))
+
+(defn hexview
+  "Prints a hexdump of the given argument to *out*.  Optionally supply byte
+offset (default: 0) and size (default: :all) arguments.  Can create hexdump from
+a collection of values, a java.io.File and a String representing a path to a
+file."
+  ([s]
+     (let [hexview-lines (hexview-lines s)
+           hexview-str (apply str hexview-lines)]
+       (println hexview-str)))
+  ([s offset]
+     (let [hexview-lines (hexview-lines s offset)
+           hexview-str (apply str hexview-lines)]
+       (println hexview-str)))
+  ([s offset size]
+     (let [hexview-lines (hexview-lines s offset size)
+           hexview-str (apply str hexview-lines)]
+       (println hexview-str))))
