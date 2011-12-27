@@ -1,5 +1,5 @@
-(ns hexview.test.core
-  (:use [hexview.core])
+(ns hexdump.test.core
+  (:use [hexdump.core])
   (:use [clojure.test]))
 
 (deftest test-printable?
