@@ -4,26 +4,21 @@
 ;; Thanks go out to kumarshantanu and TimMc from #clojure for contributions of
 ;; code and ideas
 
-(defn printable?
-  "Returns logical true if the given value is not an ISO control character."
-  [val]
-  (not (Character/isISOControl val)))
-
 (defn ascii?
   "Returns true if the given value represents a printable ASCII character."
   [val]
   (< 0x1f val 0x7f))
 
 (defn ascii
-  "Returns the ASCII character corresponding to the given value if it is a printable
-ASCII character, or a period otherwise."
+  "Returns the ASCII character corresponding to the low order byte of the given
+value if it is a printable ASCII character, or a period otherwise."
   [val]
   (let [modval (mod val 256)]
     (if (ascii? modval)
       (char modval)
       \.)))
 
-(defn hex-dump-lines
+(defn hex-ascii-lines
   "Takes a sequence of numerical values and returns a seq of strings
   representing the hexadecimal data display portion of a hexdump. Only displays
   the least significant byte of each value."
@@ -69,9 +64,9 @@ and a String representing a path to a file."
                                  (take size %)))
                              (map second))
                    byte-offsets (map #(format "%08x: " %) (map #(* 16 %) (range)))
-                   hex-data-lines (hex-dump-lines vals)
+                   hex-ascii-lines (hex-ascii-lines vals)
                    ascii-lines (ascii-lines vals)
-                   parts-seq (map list byte-offsets hex-data-lines (repeat \space) ascii-lines (repeat \newline))]
+                   parts-seq (map list byte-offsets hex-ascii-lines (repeat \space) ascii-lines (repeat \newline))]
                (map #(apply str %) parts-seq))
    :else (throw (RuntimeException. "Can only hexdump a collection, a java.io.File or a String representing a path to a file."))))
 
