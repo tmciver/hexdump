@@ -1,5 +1,6 @@
 (ns hexdump.core
-  (:import [java.io File RandomAccessFile FileNotFoundException]))
+  (:import [java.io File RandomAccessFile FileNotFoundException]
+           [java.nio ByteBuffer]))
 
 ;; Thanks go out to kumarshantanu and TimMc from #clojure for contributions of
 ;; code and ideas
@@ -54,6 +55,8 @@ and a String representing a path to a file."
                                       bs (byte-array fs)]
                                   (.read raf bs 0 fs)
                                   (hexdump-lines (seq bs) :offset offset :size size)))
+   (instance? java.nio.ByteBuffer s) (let [ba (.array s)]
+                                       (hexdump-lines (seq ba) :offset 0 :size size))
    (coll? s) (let [index (fn [s]
                            (map vector (range) s))
                    vals (->> s
