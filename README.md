@@ -39,7 +39,7 @@ prints the following to \*out\*:
     00000060: 6061 6263 6465 6667 6869 6a6b 6c6d 6e6f  `abcdefghijklmno
     00000070: 7071 7273 7475 7677 7879 7a7b 7c7d 7e7f  pqrstuvwxyz{|}~.
 
-The block on the left gives the offset (hexadecimal) of the first byte for that line.  The center block shows the hexadecimal representation of the data.  The block on the right shows the ASCII representation of the data with periods being used in place on non-printable characters.
+The block on the left gives the offset (hexadecimal) of the first byte for that line.  The center block shows the hexadecimal representation of the data.  The block on the right shows the ASCII representation of the data with periods being used in place of non-printable characters.
 
 ## License
 
