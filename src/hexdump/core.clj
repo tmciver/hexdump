@@ -42,8 +42,8 @@ value if it is a printable ASCII character, or a period otherwise."
 (defn hexdump-lines
   "Creates a sequence of lines representing a hexdump of the given argument.
 Optionally supply byte offset (:offset, default: 0) and size (:size, default:
-:all) arguments.  Can create hexdump from a collection of values, a java.io.File
-and a String representing a path to a file."
+:all) arguments.  Can create hexdump from a collection of values, a
+java.nio.ByteBuffer, a java.io.File and a String representing a path to a file."
   [s & {:keys [offset size] :or {offset 0 size :all}}]
   (cond
    (string? s) (let [f (File. s)]
@@ -74,10 +74,11 @@ and a String representing a path to a file."
    :else (throw (RuntimeException. "Can only hexdump a collection, a java.io.File or a String representing a path to a file."))))
 
 (defn hexdump
-  "Prints a hexdump of the given argument to *out*.  Optionally supply byte
-offset (:offset, default: 0) and size (:size, default: :all) arguments.  Can
-create hexdump from a collection of values, a java.io.File and a String
-representing a path to a file."
+  "Prints a hexdump of the given argument to *out*.  Optionally supply
+byte offset (:offset, default: 0) and size (:size, default: :all)
+arguments.  Can create hexdump from a collection of values, a
+java.nio.ByteBuffer, a java.io.File and a String representing a path
+to a file."
   [s & {:keys [offset size] :or {offset 0 size :all}}]
   (let [hexdump-lines (hexdump-lines s :offset offset :size size)
         hexdump-str (apply str hexdump-lines)]
